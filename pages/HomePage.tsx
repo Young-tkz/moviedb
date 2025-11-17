@@ -1,22 +1,32 @@
 
 import React, { useState, useEffect } from 'react';
 import { movieService } from '../services/movieService';
-import type { Movie } from '../types';
+import type { ContentItem } from '../types';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { SearchType } from '../App';
 
-const HomePage: React.FC = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
+interface HomePageProps {
+  searchType: SearchType;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ searchType }) => {
+  const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchContent = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await movieService.getPopularMovies();
-        setMovies(data.results);
+        if (searchType === 'movie') {
+          const data = await movieService.getPopularMovies();
+          setContent(data.results);
+        } else {
+          const data = await movieService.getPopularTvShows();
+          setContent(data.results);
+        }
       } catch (err) {
         if (err instanceof Error) {
             setError(err.message);
@@ -28,8 +38,8 @@ const HomePage: React.FC = () => {
       }
     };
 
-    fetchMovies();
-  }, []);
+    fetchContent();
+  }, [searchType]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
@@ -41,10 +51,12 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Popular Movies</h1>
+      <h1 className="text-3xl font-bold mb-8">
+        {searchType === 'movie' ? 'Popular Movies' : 'Popular TV Shows'}
+      </h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-        {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+        {content.map((item) => (
+          <MovieCard key={item.id} item={item} type={searchType} />
         ))}
       </div>
     </div>

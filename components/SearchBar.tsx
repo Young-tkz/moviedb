@@ -1,18 +1,25 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SearchType } from '../App';
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  searchType: SearchType;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ searchType }) => {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/search/${query.trim()}`);
+      navigate(`/search/${searchType}/${query.trim()}`);
       setQuery('');
     }
   };
+
+  const placeholderText = searchType === 'movie' ? 'Search for a movie...' : 'Search for a TV show...';
 
   return (
     <form onSubmit={handleSearch} className="relative">
@@ -20,7 +27,7 @@ const SearchBar: React.FC = () => {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for a movie..."
+        placeholder={placeholderText}
         className="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
       />
       <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
