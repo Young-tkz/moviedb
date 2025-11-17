@@ -1,0 +1,5 @@
+{
+  "name": "Copy of React MovieDb",
+  "description": "A mini IMDB-style web application built with React and Tailwind CSS to browse, search, and view details about movies from The Movie Database (TMDB).",
+  "requestFramePermissions": []
+}
